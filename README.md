@@ -1,4 +1,4 @@
-This repository is used only for Angular Material v1.x library deployments and localized installs using `npm` and `bower`. The actual component source-code for this library is in the
+This test repository is used only for Angular Material v1.x library deployments and localized installs using `npm` and `bower`. The actual component source-code for this library is in the
 [main Angular Material repository](https://github.com/angular/material).
 
 > Please file issues and pull requests against that `angular/material` repository only. Do not file issues here on the deployment repository.
