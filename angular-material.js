@@ -10,7 +10,7 @@
 (function(){
 "use strict";
 
-angular.module('ngMaterial', ["ng","ngAnimate","ngAria","material.core","material.core.gestures","material.core.layout","material.core.theming.palette","material.core.theming","material.core.animate","material.components.autocomplete","material.components.backdrop","material.components.bottomSheet","material.components.button","material.components.card","material.components.checkbox","material.components.chips","material.components.colors","material.components.content","material.components.datepicker","material.components.dialog","material.components.divider","material.components.fabActions","material.components.fabShared","material.components.fabSpeedDial","material.components.fabToolbar","material.components.fabTrigger","material.components.gridList","material.components.icon","material.components.input","material.components.list","material.components.menu","material.components.menuBar","material.components.navBar","material.components.panel","material.components.progressCircular","material.components.progressLinear","material.components.radioButton","material.components.select","material.components.sidenav","material.components.showHide","material.components.slider","material.components.sticky","material.components.subheader","material.components.swipe","material.components.switch","material.components.tabs","material.components.toast","material.components.toolbar","material.components.tooltip","material.components.virtualRepeat","material.components.whiteframe"]);
+angular.module('ngMaterial', ["ng","ngAnimate","ngAria","material.core","material.core.gestures","material.core.layout","material.core.theming.palette","material.core.theming","material.core.animate","material.components.autocomplete","material.components.backdrop","material.components.bottomSheet","material.components.button","material.components.card","material.components.checkbox","material.components.chips","material.components.colors","material.components.content","material.components.datepicker","material.components.dialog","material.components.fabActions","material.components.divider","material.components.fabShared","material.components.fabSpeedDial","material.components.fabToolbar","material.components.fabTrigger","material.components.gridList","material.components.icon","material.components.input","material.components.list","material.components.menu","material.components.menuBar","material.components.navBar","material.components.panel","material.components.progressCircular","material.components.progressLinear","material.components.radioButton","material.components.select","material.components.showHide","material.components.sidenav","material.components.slider","material.components.sticky","material.components.subheader","material.components.swipe","material.components.switch","material.components.tabs","material.components.toast","material.components.toolbar","material.components.tooltip","material.components.virtualRepeat","material.components.whiteframe"]);
 })();
 (function(){
 "use strict";
@@ -1522,122 +1522,6 @@ angular.element.prototype.blur = angular.element.prototype.blur || function() {
 (function(){
 "use strict";
 
-
-angular.module('material.core')
-  .service('$mdAria', AriaService);
-
-/*
- * @ngInject
- */
-function AriaService($$rAF, $log, $window, $interpolate) {
-
-  return {
-    expect: expect,
-    expectAsync: expectAsync,
-    expectWithText: expectWithText
-  };
-
-  /**
-   * Check if expected attribute has been specified on the target element or child
-   * @param element
-   * @param attrName
-   * @param {optional} defaultValue What to set the attr to if no value is found
-   */
-  function expect(element, attrName, defaultValue) {
-
-    var node = angular.element(element)[0] || element;
-
-    // if node exists and neither it nor its children have the attribute
-    if (node &&
-       ((!node.hasAttribute(attrName) ||
-        node.getAttribute(attrName).length === 0) &&
-        !childHasAttribute(node, attrName))) {
-
-      defaultValue = angular.isString(defaultValue) ? defaultValue.trim() : '';
-      if (defaultValue.length) {
-        element.attr(attrName, defaultValue);
-      } else {
-        $log.warn('ARIA: Attribute "', attrName, '", required for accessibility, is missing on node:', node);
-      }
-
-    }
-  }
-
-  function expectAsync(element, attrName, defaultValueGetter) {
-    // Problem: when retrieving the element's contents synchronously to find the label,
-    // the text may not be defined yet in the case of a binding.
-    // There is a higher chance that a binding will be defined if we wait one frame.
-    $$rAF(function() {
-        expect(element, attrName, defaultValueGetter());
-    });
-  }
-
-  function expectWithText(element, attrName) {
-    var content = getText(element) || "";
-    var hasBinding = content.indexOf($interpolate.startSymbol()) > -1;
-
-    if ( hasBinding ) {
-      expectAsync(element, attrName, function() {
-        return getText(element);
-      });
-    } else {
-      expect(element, attrName, content);
-    }
-  }
-
-  function getText(element) {
-    element = element[0] || element;
-    var walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT, null, false);
-    var text = '';
-
-    var node;
-    while (node = walker.nextNode()) {
-      if (!isAriaHiddenNode(node)) {
-        text += node.textContent;
-      }
-    }
-
-    return text.trim() || '';
-
-    function isAriaHiddenNode(node) {
-      while (node.parentNode && (node = node.parentNode) !== element) {
-        if (node.getAttribute && node.getAttribute('aria-hidden') === 'true') {
-          return true;
-        }
-      }
-    }
-  }
-
-  function childHasAttribute(node, attrName) {
-    var hasChildren = node.hasChildNodes(),
-        hasAttr = false;
-
-    function isHidden(el) {
-      var style = el.currentStyle ? el.currentStyle : $window.getComputedStyle(el);
-      return (style.display === 'none');
-    }
-
-    if (hasChildren) {
-      var children = node.childNodes;
-      for (var i=0; i < children.length; i++) {
-        var child = children[i];
-        if (child.nodeType === 1 && child.hasAttribute(attrName)) {
-          if (!isHidden(child)) {
-            hasAttr = true;
-          }
-        }
-      }
-    }
-
-    return hasAttr;
-  }
-}
-AriaService.$inject = ["$$rAF", "$log", "$window", "$interpolate"];
-
-})();
-(function(){
-"use strict";
-
 angular
   .module('material.core')
   .service('$mdCompiler', mdCompilerService);
@@ -1778,6 +1662,122 @@ function mdCompilerService($q, $templateRequest, $injector, $compile, $controlle
   };
 }
 mdCompilerService.$inject = ["$q", "$templateRequest", "$injector", "$compile", "$controller"];
+
+})();
+(function(){
+"use strict";
+
+
+angular.module('material.core')
+  .service('$mdAria', AriaService);
+
+/*
+ * @ngInject
+ */
+function AriaService($$rAF, $log, $window, $interpolate) {
+
+  return {
+    expect: expect,
+    expectAsync: expectAsync,
+    expectWithText: expectWithText
+  };
+
+  /**
+   * Check if expected attribute has been specified on the target element or child
+   * @param element
+   * @param attrName
+   * @param {optional} defaultValue What to set the attr to if no value is found
+   */
+  function expect(element, attrName, defaultValue) {
+
+    var node = angular.element(element)[0] || element;
+
+    // if node exists and neither it nor its children have the attribute
+    if (node &&
+       ((!node.hasAttribute(attrName) ||
+        node.getAttribute(attrName).length === 0) &&
+        !childHasAttribute(node, attrName))) {
+
+      defaultValue = angular.isString(defaultValue) ? defaultValue.trim() : '';
+      if (defaultValue.length) {
+        element.attr(attrName, defaultValue);
+      } else {
+        $log.warn('ARIA: Attribute "', attrName, '", required for accessibility, is missing on node:', node);
+      }
+
+    }
+  }
+
+  function expectAsync(element, attrName, defaultValueGetter) {
+    // Problem: when retrieving the element's contents synchronously to find the label,
+    // the text may not be defined yet in the case of a binding.
+    // There is a higher chance that a binding will be defined if we wait one frame.
+    $$rAF(function() {
+        expect(element, attrName, defaultValueGetter());
+    });
+  }
+
+  function expectWithText(element, attrName) {
+    var content = getText(element) || "";
+    var hasBinding = content.indexOf($interpolate.startSymbol()) > -1;
+
+    if ( hasBinding ) {
+      expectAsync(element, attrName, function() {
+        return getText(element);
+      });
+    } else {
+      expect(element, attrName, content);
+    }
+  }
+
+  function getText(element) {
+    element = element[0] || element;
+    var walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT, null, false);
+    var text = '';
+
+    var node;
+    while (node = walker.nextNode()) {
+      if (!isAriaHiddenNode(node)) {
+        text += node.textContent;
+      }
+    }
+
+    return text.trim() || '';
+
+    function isAriaHiddenNode(node) {
+      while (node.parentNode && (node = node.parentNode) !== element) {
+        if (node.getAttribute && node.getAttribute('aria-hidden') === 'true') {
+          return true;
+        }
+      }
+    }
+  }
+
+  function childHasAttribute(node, attrName) {
+    var hasChildren = node.hasChildNodes(),
+        hasAttr = false;
+
+    function isHidden(el) {
+      var style = el.currentStyle ? el.currentStyle : $window.getComputedStyle(el);
+      return (style.display === 'none');
+    }
+
+    if (hasChildren) {
+      var children = node.childNodes;
+      for (var i=0; i < children.length; i++) {
+        var child = children[i];
+        if (child.nodeType === 1 && child.hasAttribute(attrName)) {
+          if (!isHidden(child)) {
+            hasAttr = true;
+          }
+        }
+      }
+    }
+
+    return hasAttr;
+  }
+}
+AriaService.$inject = ["$$rAF", "$log", "$window", "$interpolate"];
 
 })();
 (function(){
@@ -10774,46 +10774,6 @@ MdDialogProvider.$inject = ["$$interimElementProvider"];
 (function(){
 "use strict";
 
-/**
- * @ngdoc module
- * @name material.components.divider
- * @description Divider module!
- */
-angular.module('material.components.divider', [
-  'material.core'
-])
-  .directive('mdDivider', MdDividerDirective);
-
-/**
- * @ngdoc directive
- * @name mdDivider
- * @module material.components.divider
- * @restrict E
- *
- * @description
- * Dividers group and separate content within lists and page layouts using strong visual and spatial distinctions. This divider is a thin rule, lightweight enough to not distract the user from content.
- *
- * @param {boolean=} md-inset Add this attribute to activate the inset divider style.
- * @usage
- * <hljs lang="html">
- * <md-divider></md-divider>
- *
- * <md-divider md-inset></md-divider>
- * </hljs>
- *
- */
-function MdDividerDirective($mdTheming) {
-  return {
-    restrict: 'E',
-    link: $mdTheming
-  };
-}
-MdDividerDirective.$inject = ["$mdTheming"];
-
-})();
-(function(){
-"use strict";
-
 (function() {
   'use strict';
 
@@ -10867,6 +10827,46 @@ MdDividerDirective.$inject = ["$mdTheming"];
   }
 
 })();
+
+})();
+(function(){
+"use strict";
+
+/**
+ * @ngdoc module
+ * @name material.components.divider
+ * @description Divider module!
+ */
+angular.module('material.components.divider', [
+  'material.core'
+])
+  .directive('mdDivider', MdDividerDirective);
+
+/**
+ * @ngdoc directive
+ * @name mdDivider
+ * @module material.components.divider
+ * @restrict E
+ *
+ * @description
+ * Dividers group and separate content within lists and page layouts using strong visual and spatial distinctions. This divider is a thin rule, lightweight enough to not distract the user from content.
+ *
+ * @param {boolean=} md-inset Add this attribute to activate the inset divider style.
+ * @usage
+ * <hljs lang="html">
+ * <md-divider></md-divider>
+ *
+ * <md-divider md-inset></md-divider>
+ * </hljs>
+ *
+ */
+function MdDividerDirective($mdTheming) {
+  return {
+    restrict: 'E',
+    link: $mdTheming
+  };
+}
+MdDividerDirective.$inject = ["$mdTheming"];
 
 })();
 (function(){
@@ -18770,6 +18770,49 @@ SelectProvider.$inject = ["$$interimElementProvider"];
 
 /**
  * @ngdoc module
+ * @name material.components.showHide
+ */
+
+// Add additional handlers to ng-show and ng-hide that notify directives
+// contained within that they should recompute their size.
+// These run in addition to Angular's built-in ng-hide and ng-show directives.
+angular.module('material.components.showHide', [
+  'material.core'
+])
+  .directive('ngShow', createDirective('ngShow', true))
+  .directive('ngHide', createDirective('ngHide', false));
+
+
+function createDirective(name, targetValue) {
+  return ['$mdUtil', function($mdUtil) {
+    return {
+      restrict: 'A',
+      multiElement: true,
+      link: function($scope, $element, $attr) {
+        var unregister = $scope.$on('$md-resize-enable', function() {
+          unregister();
+
+          $scope.$watch($attr[name], function(value) {
+            if (!!value === targetValue) {
+              $mdUtil.nextTick(function() {
+                $scope.$broadcast('$md-resize');
+              });
+              $mdUtil.dom.animator.waitTransitionEnd($element).then(function() {
+                $scope.$broadcast('$md-resize');
+              });
+            }
+          });
+        });
+      }
+    };
+  }];
+}
+})();
+(function(){
+"use strict";
+
+/**
+ * @ngdoc module
  * @name material.components.sidenav
  *
  * @description
@@ -19220,49 +19263,6 @@ function SidenavController($scope, $element, $attrs, $mdComponentRegistry, $q) {
 }
 SidenavController.$inject = ["$scope", "$element", "$attrs", "$mdComponentRegistry", "$q"];
 
-})();
-(function(){
-"use strict";
-
-/**
- * @ngdoc module
- * @name material.components.showHide
- */
-
-// Add additional handlers to ng-show and ng-hide that notify directives
-// contained within that they should recompute their size.
-// These run in addition to Angular's built-in ng-hide and ng-show directives.
-angular.module('material.components.showHide', [
-  'material.core'
-])
-  .directive('ngShow', createDirective('ngShow', true))
-  .directive('ngHide', createDirective('ngHide', false));
-
-
-function createDirective(name, targetValue) {
-  return ['$mdUtil', function($mdUtil) {
-    return {
-      restrict: 'A',
-      multiElement: true,
-      link: function($scope, $element, $attr) {
-        var unregister = $scope.$on('$md-resize-enable', function() {
-          unregister();
-
-          $scope.$watch($attr[name], function(value) {
-            if (!!value === targetValue) {
-              $mdUtil.nextTick(function() {
-                $scope.$broadcast('$md-resize');
-              });
-              $mdUtil.dom.animator.waitTransitionEnd($element).then(function() {
-                $scope.$broadcast('$md-resize');
-              });
-            }
-          });
-        });
-      }
-    };
-  }];
-}
 })();
 (function(){
 "use strict";
@@ -29208,11 +29208,12 @@ function MdTabsController ($scope, $element, $window, $mdConstant, $mdTabInkRipp
         left        = tab.offsetLeft,
         canvasWidth = elements.canvas.clientWidth,
         totalWidth  = elements.paging.offsetWidth,
-        maxOffset   = totalWidth - canvasWidth;
-
+        maxOffset   = totalWidth - canvasWidth,
+        // Dirty hack because the tab widths aren't rounded
+        right   = (totalWidth - left - tab.offsetWidth < 5) ? 0 : totalWidth - left - tab.offsetWidth;
     // Changed to calculate from the right
     ctrl.offsetLeft = Math.max(ctrl.offsetLeft, fixOffset(maxOffset - left));
-    ctrl.offsetLeft = Math.min(ctrl.offsetLeft, fixOffset(totalWidth - left - tab.offsetWidth));
+    ctrl.offsetLeft = Math.min(ctrl.offsetLeft, fixOffset(right));
   }
 
   /**
