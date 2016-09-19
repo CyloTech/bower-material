@@ -2,7 +2,7 @@
  * Angular Material Design
  * https://github.com/angular/material
  * @license MIT
- * v1.1.0
+ * v1.1.1
  */
 $font-family: Roboto, 'Helvetica Neue', sans-serif !default;
 $font-size:   10px !default;
@@ -91,15 +91,13 @@ $checkbox-width: 20px !default;
 $checkbox-height: $checkbox-width !default;
 $checkbox-border-radius: 2px !default;
 $checkbox-border-width: 2px !default;
-// Function
-//-- Must be defined before variables
-@function rem($multiplier) {
-  $font-size: 10px;
-  @return $multiplier * $font-size;
-}
-
 // Typography
 // ------------------------------
+
+//-- Must be defined before $font-size.
+@function rem($multiplier) {
+  @return $multiplier * $font-size;
+}
 
 
 
@@ -901,12 +899,6 @@ $checkbox-border-width: 2px !default;
 
     @include flex-properties-for-name($name);
     @include layout-for-name($name);
-}
-
-/* IE10-IE11 column-flex bug fix (set proper default value) */
-.layout-column > .flex {
-	-ms-flex-basis: auto;
-	flex-basis: auto;
 }
 
 /*
